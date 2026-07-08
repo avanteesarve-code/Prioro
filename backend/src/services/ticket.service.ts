@@ -90,6 +90,33 @@ async function resolvePriorityId(priorityLabel: PriorityLabel, fallbackPriorityI
   return existingFallback?.id ?? null;
 }
 
+async function findLeastLoadedAgent() {
+  const agents = await prisma.user.findMany({
+    where: {
+      role: 'AGENT',
+    },
+    include: {
+      assignedTickets: {
+        where: {
+          status: {
+            in: ['OPEN', 'IN_PROGRESS'],
+          },
+        },
+      },
+    },
+  });
+
+  if (agents.length === 0) {
+    return null;
+  }
+
+  const sortedAgents = agents.sort(
+    (a, b) => a.assignedTickets.length - b.assignedTickets.length,
+  );
+
+  return sortedAgents[0];
+}
+
 export async function createTicket(data: CreateTicketInput) {
   const ticket = await prisma.ticket.create({
     data: {
@@ -107,9 +134,11 @@ export async function createTicket(data: CreateTicketInput) {
     body: data.description,
   });
 
-  const [resolvedCategoryId, resolvedPriorityId] = await Promise.all([
+  const [resolvedCategoryId, resolvedPriorityId, assignedAgent] =
+  await Promise.all([
     resolveCategoryId(classification.category, data.categoryId),
     resolvePriorityId(classification.priority, data.priorityId),
+    findLeastLoadedAgent(),
   ]);
 
   const updatedTicket = await prisma.ticket.update({
@@ -117,6 +146,7 @@ export async function createTicket(data: CreateTicketInput) {
     data: {
       categoryId: resolvedCategoryId,
       priorityId: resolvedPriorityId,
+      assignedAgentId: assignedAgent?.id ?? null,
       aiConfidenceCategory: classification.confidenceCategory ?? null,
       aiConfidencePriority: classification.confidencePriority ?? null,
     },
@@ -141,6 +171,20 @@ export async function createTicket(data: CreateTicketInput) {
   } catch (error) {
     console.error('Failed to persist AIResponse for ticket:', ticket.id, error);
   }
+
+if (assignedAgent) {
+  await prisma.ticketActivity.create({
+    data: {
+      ticketId: ticket.id,
+      actorType: 'SYSTEM',
+      action: 'AUTO_ASSIGNED',
+      detail: {
+        assignedAgentId: assignedAgent.id,
+        assignedAgentName: assignedAgent.name,
+      },
+    },
+  });
+}
 
   return updatedTicket;
 }
@@ -200,5 +244,49 @@ export async function getTicketStats() {
     resolvedTickets,
     closedTickets,
     urgentTickets,
+  };
+}
+
+export async function getTicketsByAgent(agentId: string) {
+  console.log('Agent ID:', agentId);
+
+  const agent = await prisma.user.findUnique({
+    where: {
+      id: agentId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+  });
+
+  console.log('Agent Found:', agent);
+
+  if (!agent) {
+    throw new AppError('Agent not found', 404);
+  }
+
+  const activeTickets = await prisma.ticket.findMany({
+    where: {
+      assignedAgentId: agentId,
+      status: {
+        in: ['OPEN', 'IN_PROGRESS'],
+      },
+    },
+    include: {
+      category: true,
+      priority: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return {
+    agent,
+    activeTicketCount: activeTickets.length,
+    activeTickets,
   };
 }

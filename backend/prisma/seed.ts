@@ -44,8 +44,20 @@ async function main() {
           role: UserRole.ADMIN,
         },
         {
-          name: 'Agent User',
-          email: 'agent@supportiq.com',
+          name: 'Rahul Sharma',
+          email: 'rahul@supportiq.com',
+          passwordHash,
+          role: UserRole.AGENT,
+        },
+        {
+          name: 'Priya Patel',
+          email: 'priya@supportiq.com',
+          passwordHash,
+          role: UserRole.AGENT,
+        },
+        {
+          name: 'Amit Verma',
+          email: 'amit@supportiq.com',
           passwordHash,
           role: UserRole.AGENT,
         },

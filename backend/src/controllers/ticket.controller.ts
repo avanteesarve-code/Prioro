@@ -12,6 +12,7 @@ import {
   getTicketById,
   getTicketStats,
   getTickets,
+  getTicketsByAgent,
   updateTicketStatus,
 } from '../services/ticket.service.js';
 
@@ -72,4 +73,23 @@ export async function getTicketStatsController(_req: Request, res: Response, nex
   } catch (error) {
     return next(error);
   }
+}
+
+export async function getTicketsByAgentController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const agentId = String(req.params.agentId);
+
+    const result = await getTicketsByAgent(agentId);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success('Agent workload fetched successfully', result));
+  } catch (error) {
+  console.error('Agent API Error:', error);
+  return next(error);
+}
 }
