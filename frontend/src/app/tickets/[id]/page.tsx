@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import { useEffect, useState } from 'react';
 
 import { StatusSelector } from '@/components/tickets/status-selector';
@@ -11,18 +10,18 @@ import { AIInsightsCard } from '@/components/tickets/ai-insights-card';
 import { AssignedAgentCard } from '@/components/tickets/assigned-agent-card';
 
 interface TicketDetailsPageProps {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 }
 
-export default async function TicketDetailsPage({
+export default function TicketDetailsPage({
   params,
 }: TicketDetailsPageProps) {
-  const { id } = await params;
-
   return (
-    <TicketDetailsContent id={id} />
+    <TicketDetailsContent
+      id={params.id}
+    />
   );
 }
 
@@ -125,7 +124,9 @@ function TicketDetailsContent({
       ticket.priority?.label ?? 'LOW'
     }
   />
-  <AIInsightsCard
+</div>
+
+<AIInsightsCard
   category={ticket.category?.name}
   priority={ticket.priority?.label}
   categoryConfidence={
@@ -145,7 +146,6 @@ function TicketDetailsContent({
 />
 
 </div>
-      </div>
     </main>
   );
 }
