@@ -1,7 +1,10 @@
 import { AIResponseStatus, Prisma, PriorityLabel, TicketStatus } from '@prisma/client';
 
 import { prisma } from '../config/prisma.js';
-import { classifyTicket } from './ai.service.js';
+import {
+  classifyTicket,
+  generateSuggestedReply,
+} from './ai.service.js';
 import { AppError } from '../utils/appError.js';
 import type { SupportedTicketCategory } from '../types/ai.types.js';
 import type {
@@ -304,4 +307,30 @@ export async function getTicketsByAgent(agentId: string) {
     activeTicketCount: activeTickets.length,
     activeTickets,
   };
+}
+
+export async function getSuggestedReplyForTicket(
+  ticketId: string,
+) {
+  const ticket = await prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+    select: {
+      id: true,
+      subject: true,
+      body: true,
+    },
+  });
+
+  if (!ticket) {
+    throw new AppError('Ticket not found', 404);
+  }
+
+  const suggestion = await generateSuggestedReply(
+    ticket.subject,
+    ticket.body,
+  );
+
+  return suggestion;
 }

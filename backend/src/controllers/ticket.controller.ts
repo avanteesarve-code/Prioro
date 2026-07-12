@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 
+
 import { ApiResponse } from '../utils/ApiResponse.js';
 import {
   createTicketSchema,
@@ -11,6 +12,7 @@ import {
   createTicket,
   getTicketById,
   getTicketStats,
+  getSuggestedReplyForTicket,
   getTickets,
   getTicketsByAgent,
   updateTicketStatus,
@@ -48,6 +50,30 @@ export async function getTicketByIdController(req: Request, res: Response, next:
     }
 
     return res.status(200).json(ApiResponse.success('Ticket fetched successfully', ticket));
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function getSuggestedReplyController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = ticketIdParamSchema.parse(req.params);
+
+    const suggestion =
+      await getSuggestedReplyForTicket(id);
+
+    return res
+      .status(200)
+      .json(
+        ApiResponse.success(
+          'Suggested reply generated successfully',
+          suggestion,
+        ),
+      );
   } catch (error) {
     return next(error);
   }
