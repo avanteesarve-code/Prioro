@@ -1,6 +1,7 @@
 import { api } from '@/lib/api';
 import type { Ticket } from '@/types/ticket';
 
+
 export interface CreateTicketPayload {
   title: string;
   description: string;
@@ -39,6 +40,16 @@ export async function createTicket(
   const response = await api.post(
     '/tickets',
     payload,
+  );
+
+  return response.data.data;
+}
+
+export async function getSuggestedReply(
+  ticketId: string,
+) {
+  const response = await api.get(
+    `/tickets/${ticketId}/suggested-reply`,
   );
 
   return response.data.data;

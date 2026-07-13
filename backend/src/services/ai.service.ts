@@ -229,17 +229,21 @@ export async function generateSuggestedReply(
     );
 
     const suggestedReply = await callGemini(prompt);
+    const cleanedReply = suggestedReply
+  .replace(/^"+|"+$/g, '')
+  .replace(/\\"/g, '"')
+  .replace(/\\n/g, '\n');
 
     return {
-      suggestedReply,
-      knowledgeSources: [
-        ...new Set(
-          retrievedChunks.map(
-            (chunk) => chunk.documentTitle,
-          ),
-        ),
-      ],
-    };
+  suggestedReply: cleanedReply,
+  knowledgeSources: [
+    ...new Set(
+      retrievedChunks.map(
+        (chunk) => chunk.documentTitle,
+      ),
+    ),
+  ],
+};
   } catch (error) {
     console.error(
       'Suggested reply generation failed:',

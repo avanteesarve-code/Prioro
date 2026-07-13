@@ -4,7 +4,10 @@ import { use, useEffect, useState } from 'react';
 
 import { StatusSelector } from '@/components/tickets/status-selector';
 import { useTicket } from '@/hooks/use-ticket';
-import { updateTicketStatus } from '@/services/ticket.service';
+import {
+  updateTicketStatus,
+  getSuggestedReply,
+} from '@/services/ticket.service';
 import { StatusBadge } from '@/components/tickets/status-badge';
 import { PriorityBadge } from '@/components/tickets/priority-badge';
 import { AIInsightsCard } from '@/components/tickets/ai-insights-card';
@@ -39,6 +42,15 @@ function TicketDetailsContent({
   const [status, setStatus] =
     useState('');
 
+    const [replyLoading, setReplyLoading] =
+  useState(false);
+
+const [suggestedReply, setSuggestedReply] =
+  useState('');
+
+const [knowledgeSources, setKnowledgeSources] =
+  useState<string[]>([]);
+
   useEffect(() => {
     if (ticket) {
       setStatus(ticket.status);
@@ -66,6 +78,31 @@ function TicketDetailsContent({
       );
     }
   }
+
+  async function handleGenerateReply() {
+  try {
+    setReplyLoading(true);
+
+    const result =
+      await getSuggestedReply(id);
+
+    setSuggestedReply(
+      result.suggestedReply,
+    );
+
+    setKnowledgeSources(
+      result.knowledgeSources,
+    );
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      'Failed to generate reply',
+    );
+  } finally {
+    setReplyLoading(false);
+  }
+}
 
   if (loading) {
     return (
@@ -159,6 +196,18 @@ function TicketDetailsContent({
         </div>
       </div>
 
+<div>
+  <button
+    onClick={handleGenerateReply}
+    disabled={replyLoading}
+    className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+  >
+    {replyLoading
+      ? 'Generating...'
+      : 'Generate Suggested Reply'}
+  </button>
+</div>
+
       {/* Right Column */}
       <div className="space-y-6">
 
@@ -185,11 +234,44 @@ function TicketDetailsContent({
 
     </div>
 
-    <section className="mt-8">
-      <ActivityTimeline
-        activities={ticket.activities}
-      />
-    </section>
+    {suggestedReply && (
+  <section className="mt-8">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+        AI Suggested Reply
+      </h2>
+
+      <div className="rounded-md bg-gray-50 p-4 dark:bg-zinc-900">
+        <p className="whitespace-pre-wrap text-gray-900 dark:text-white">
+          {suggestedReply}
+        </p>
+      </div>
+
+      <div className="mt-4">
+        <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+          Knowledge Sources
+        </h3>
+
+        <div className="flex flex-wrap gap-2">
+          {knowledgeSources.map((source) => (
+            <span
+              key={source}
+              className="rounded-full border border-gray-300 px-3 py-1 text-sm dark:border-zinc-700"
+            >
+              {source}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<section className="mt-8">
+  <ActivityTimeline
+    activities={ticket.activities}
+  />
+</section>
   </main>
 );
 }
