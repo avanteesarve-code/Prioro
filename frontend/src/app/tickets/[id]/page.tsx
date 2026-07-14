@@ -88,11 +88,18 @@ async function handleCopyReply() {
       suggestedReply,
     );
 
+
     alert('Reply copied');
   } catch (error) {
     console.error(error);
     alert('Failed to copy reply');
   }
+}
+
+function handleUseReply(
+  reply: string,
+) {
+  setSuggestedReply(reply);
 }
 
   async function handleGenerateReply() {
@@ -337,12 +344,27 @@ setReplyHistory((prev) => [
     <div className="space-y-3">
       {replyHistory.map((reply, index) => (
         <div
-          key={index}
-          className="rounded-md border p-3 text-sm"
-        >
-          <div className="mb-2 font-medium">
-            Version {index + 1}
-          </div>
+  key={index}
+  onClick={() =>
+    handleUseReply(reply)
+  }
+  className="cursor-pointer rounded-md border p-3 text-sm transition hover:bg-gray-50 dark:hover:bg-zinc-900"
+>
+          <div className="mb-2 flex items-center justify-between">
+  <span className="font-medium">
+    Version {index + 1}
+  </span>
+
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      handleUseReply(reply);
+    }}
+    className="rounded border px-2 py-1 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800"
+  >
+    Use This
+  </button>
+</div>
 
           <p className="whitespace-pre-wrap">
             {reply}
