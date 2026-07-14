@@ -79,6 +79,19 @@ const [knowledgeSources, setKnowledgeSources] =
     }
   }
 
+async function handleCopyReply() {
+  try {
+    await navigator.clipboard.writeText(
+      suggestedReply,
+    );
+
+    alert('Reply copied');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to copy reply');
+  }
+}
+
   async function handleGenerateReply() {
   try {
     setReplyLoading(true);
@@ -237,9 +250,18 @@ const [knowledgeSources, setKnowledgeSources] =
     {suggestedReply && (
   <section className="mt-8">
     <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-        AI Suggested Reply
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+    AI Suggested Reply
+  </h2>
+
+  <button
+    onClick={handleCopyReply}
+    className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
+  >
+    Copy Reply
+  </button>
+</div>
 
       <div className="rounded-md bg-gray-50 p-4 dark:bg-zinc-900">
         <p className="whitespace-pre-wrap text-gray-900 dark:text-white">
