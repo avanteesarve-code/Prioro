@@ -48,6 +48,9 @@ function TicketDetailsContent({
 const [suggestedReply, setSuggestedReply] =
   useState('');
 
+const [replyHistory, setReplyHistory] =
+  useState<string[]>([]);
+
 const [knowledgeSources, setKnowledgeSources] =
   useState<string[]>([]);
 
@@ -103,6 +106,10 @@ async function handleCopyReply() {
       result.suggestedReply,
     );
 
+    setReplyHistory([
+  result.suggestedReply,
+]);
+
     setKnowledgeSources(
       result.knowledgeSources,
     );
@@ -111,6 +118,36 @@ async function handleCopyReply() {
 
     alert(
       'Failed to generate reply',
+    );
+  } finally {
+    setReplyLoading(false);
+  }
+}
+
+async function handleRegenerateReply() {
+  try {
+    setReplyLoading(true);
+
+    const result =
+      await getSuggestedReply(id);
+
+    setSuggestedReply(
+      result.suggestedReply,
+    );
+
+setReplyHistory((prev) => [
+  ...prev,
+  result.suggestedReply,
+]);
+
+    setKnowledgeSources(
+      result.knowledgeSources,
+    );
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      'Failed to regenerate reply',
     );
   } finally {
     setReplyLoading(false);
@@ -144,7 +181,6 @@ async function handleCopyReply() {
     </h1>
 
     <div className="mt-6 grid gap-6 lg:grid-cols-3">
-
       {/* Left Column */}
       <div className="lg:col-span-2">
         <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
@@ -153,7 +189,6 @@ async function handleCopyReply() {
           </h2>
 
           <div className="space-y-6">
-
             <div>
               <p className="text-sm text-gray-600 dark:text-zinc-400">
                 Subject
@@ -205,25 +240,23 @@ async function handleCopyReply() {
               />
             </div>
 
+            <div>
+              <button
+                onClick={handleGenerateReply}
+                disabled={replyLoading}
+                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {replyLoading
+                  ? 'Generating...'
+                  : 'Generate Suggested Reply'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-<div>
-  <button
-    onClick={handleGenerateReply}
-    disabled={replyLoading}
-    className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-  >
-    {replyLoading
-      ? 'Generating...'
-      : 'Generate Suggested Reply'}
-  </button>
-</div>
-
       {/* Right Column */}
       <div className="space-y-6">
-
         <AssignedAgentCard
           agent={ticket.assignedAgent}
         />
@@ -242,58 +275,103 @@ async function handleCopyReply() {
               ?.generatedText
           }
         />
-
       </div>
-
     </div>
 
     {suggestedReply && (
-  <section className="mt-8">
-    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mb-4 flex items-center justify-between">
-  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-    AI Suggested Reply
-  </h2>
+      <section className="mt-8">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              AI Suggested Reply
+            </h2>
 
-  <button
-    onClick={handleCopyReply}
-    className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
-  >
-    Copy Reply
-  </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleRegenerateReply}
+                disabled={replyLoading}
+                className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-zinc-800"
+              >
+                {replyLoading
+                  ? 'Generating...'
+                  : 'Regenerate'}
+              </button>
+
+              <button
+                onClick={handleCopyReply}
+                className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
+              >
+                Copy Reply
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-md bg-gray-50 p-4 dark:bg-zinc-900">
+            <p className="whitespace-pre-wrap text-gray-900 dark:text-white">
+              {suggestedReply}
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+  Knowledge Sources
+</h3>
+
+<div className="flex flex-wrap gap-2">
+  {knowledgeSources.map((source) => (
+    <span
+      key={source}
+      className="rounded-full border border-gray-300 px-3 py-1 text-sm dark:border-zinc-700"
+    >
+      {source}
+    </span>
+  ))}
 </div>
 
-      <div className="rounded-md bg-gray-50 p-4 dark:bg-zinc-900">
-        <p className="whitespace-pre-wrap text-gray-900 dark:text-white">
-          {suggestedReply}
-        </p>
-      </div>
+{replyHistory.length > 1 && (
+  <div className="mt-6">
+    <h3 className="mb-3 font-medium text-gray-900 dark:text-white">
+      Reply History
+    </h3>
 
-      <div className="mt-4">
-        <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-          Knowledge Sources
-        </h3>
+    <div className="space-y-3">
+      {replyHistory.map((reply, index) => (
+        <div
+          key={index}
+          className="rounded-md border p-3 text-sm"
+        >
+          <div className="mb-2 font-medium">
+            Version {index + 1}
+          </div>
 
-        <div className="flex flex-wrap gap-2">
-          {knowledgeSources.map((source) => (
-            <span
-              key={source}
-              className="rounded-full border border-gray-300 px-3 py-1 text-sm dark:border-zinc-700"
-            >
-              {source}
-            </span>
-          ))}
+          <p className="whitespace-pre-wrap">
+            {reply}
+          </p>
         </div>
-      </div>
+      ))}
     </div>
-  </section>
+  </div>
 )}
 
-<section className="mt-8">
-  <ActivityTimeline
-    activities={ticket.activities}
-  />
-</section>
+            <div className="flex flex-wrap gap-2">
+              {knowledgeSources.map((source) => (
+                <span
+                  key={source}
+                  className="rounded-full border border-gray-300 px-3 py-1 text-sm dark:border-zinc-700"
+                >
+                  {source}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section className="mt-8">
+      <ActivityTimeline
+        activities={ticket.activities}
+      />
+    </section>
   </main>
-);
-}
+);}
