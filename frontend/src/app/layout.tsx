@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SupportIQ",
+  title: "Prioro",
   description: "AI-powered customer support ticket triage and automation platform",
 };
 

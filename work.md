@@ -1,8 +1,8 @@
-# SupportIQ Progress Tracker
+# Prioro Progress Tracker
 
 ## Project Overview
 
-SupportIQ is an AI-powered customer support ticket triage and automation platform that automatically classifies, prioritizes, and assigns support tickets using AI.
+Prioro is an AI-powered customer support ticket triage and automation platform that automatically classifies, prioritizes, and assigns support tickets using AI.
 
 ### Tech Stack
 

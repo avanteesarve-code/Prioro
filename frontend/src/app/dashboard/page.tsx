@@ -14,7 +14,7 @@ export default function DashboardPage() {
 
   return (
     <main className="container mx-auto bg-white p-6 text-gray-900 dark:bg-black dark:text-white">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">SupportIQ Dashboard</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Prioro Dashboard</h1>
 
       <p className="mt-2 text-gray-600 dark:text-zinc-400">
         Admin analytics and ticket monitoring

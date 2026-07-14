@@ -51,7 +51,7 @@ AI-powered customer support ticket triage and automation platform that helps sup
 ## Project Architecture
 
 ```text
-SUPPORTIQ/
+Prioro/
 ├── frontend/
 │   ├── src/
 │   ├── public/

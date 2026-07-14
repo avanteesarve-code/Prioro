@@ -85,25 +85,25 @@ async function main() {
       data: [
         {
           name: 'Admin User',
-          email: 'admin@supportiq.com',
+          email: 'admin@Prioro.com',
           passwordHash,
           role: UserRole.ADMIN,
         },
         {
           name: 'Rahul Sharma',
-          email: 'rahul@supportiq.com',
+          email: 'rahul@Prioro.com',
           passwordHash,
           role: UserRole.AGENT,
         },
         {
           name: 'Priya Patel',
-          email: 'priya@supportiq.com',
+          email: 'priya@Prioro.com',
           passwordHash,
           role: UserRole.AGENT,
         },
         {
           name: 'Amit Verma',
-          email: 'amit@supportiq.com',
+          email: 'amit@Prioro.com',
           passwordHash,
           role: UserRole.AGENT,
         },

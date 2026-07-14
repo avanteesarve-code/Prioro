@@ -9,7 +9,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-center text-5xl font-bold tracking-tight text-gray-900 dark:text-white">
-            SupportIQ
+            Prioro
           </h1>
 
           <p className="mt-4 text-center text-2xl font-semibold text-gray-600 dark:text-zinc-400">
