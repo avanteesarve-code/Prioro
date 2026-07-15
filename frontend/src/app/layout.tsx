@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from '@/components/layout/sidebar';
+import { Navbar } from '@/components/layout/navbar';
+
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 
@@ -31,13 +32,13 @@ export default function RootLayout({
         <ThemeProvider>
           <Toaster richColors position="top-right" theme="system" />
 
-          <div className="flex min-h-screen bg-background text-foreground">
-            <Sidebar />
+          <div className="min-h-screen bg-background text-foreground">
+  <Navbar />
 
-            <main className="flex-1 overflow-auto bg-background text-foreground">
-              {children}
-            </main>
-          </div>
+  <main>
+    {children}
+  </main>
+</div>
         </ThemeProvider>
       </body>
     </html>
