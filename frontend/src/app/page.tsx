@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import AnimatedCard from '@/components/ui/animated-card';
 
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900 dark:bg-black dark:text-white">
@@ -43,6 +44,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      
 
       {/* Features */}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
